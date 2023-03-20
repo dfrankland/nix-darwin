@@ -123,6 +123,33 @@ in {
       '';
     };
 
+    system.defaults.dock.persistent-apps = mkOption {
+      type = types.nullOr (types.listOf (types.either types.path types.str));
+      default = null;
+      example = [ "/Applications/Safari.app" "/System/Applications/Utilities/Terminal.app" ];
+      description = lib.mdDoc ''
+        Persistent applications in the dock.
+      '';
+      apply = x:
+        if isList x then
+          map
+            (app: ''
+              <dict>
+                <key>tile-data</key>
+                <dict>
+                  <key>file-data</key>
+                  <dict>
+                    <key>_CFURLString</key>
+                    <string>${toString app}</string>
+                    <key>_CFURLStringType</key>
+                    <integer>0</integer>
+                  </dict>
+                </dict>
+              </dict>
+            '')
+            x else x;
+    };
+
     system.defaults.dock.show-process-indicators = mkOption {
       type = types.nullOr types.bool;
       default = null;
