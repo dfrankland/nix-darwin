@@ -130,24 +130,10 @@ in {
       description = lib.mdDoc ''
         Persistent applications in the dock.
       '';
-      apply = x:
-        if isList x then
-          map
-            (app: ''
-              <dict>
-                <key>tile-data</key>
-                <dict>
-                  <key>file-data</key>
-                  <dict>
-                    <key>_CFURLString</key>
-                    <string>${toString app}</string>
-                    <key>_CFURLStringType</key>
-                    <integer>0</integer>
-                  </dict>
-                </dict>
-              </dict>
-            '')
-            x else x;
+      apply = value:
+        if !(isList value)
+        then value
+        else map (app: { tile-data = { file-data = { _CFURLString = app; _CFURLStringType = 0; }; }; }) value;
     };
 
     system.defaults.dock.show-process-indicators = mkOption {
